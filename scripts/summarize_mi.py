@@ -1,7 +1,10 @@
 """
-Analyze complexity results output in JSON form by radon.
+Analyze maintainability index results output in JSON form by radon.
 """
 import json
+import pprint
+import sys
+
 
 def analyze_mi_results(filename):
 
@@ -13,6 +16,9 @@ def analyze_mi_results(filename):
     total_mi = 0
 
     for filename in data:
+        if 'mi' not in data[filename]:
+            print 'No MI data found for {}, skipping.'.format(filename)
+            continue
         min_mi = min(min_mi, data[filename]['mi'])
         max_mi = max(max_mi, data[filename]['mi'])
         total_mi += data[filename]['mi']
@@ -24,5 +30,4 @@ def analyze_mi_results(filename):
     }
 
 if __name__ == '__main__':
-    import sys, pprint
     pprint.pprint(analyze_mi_results(sys.argv[1]))

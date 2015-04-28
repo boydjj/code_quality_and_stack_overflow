@@ -2,6 +2,9 @@
 Analyze complexity results output in JSON form by radon.
 """
 import json
+import pprint
+import sys
+
 
 def analyze_complexity_report(filename):
 
@@ -16,13 +19,13 @@ def analyze_complexity_report(filename):
     total_block_complexity = 0
     num_blocks = 0
 
-    least_complex_file = None
-    most_complex_file = None
-
     for filename in data:
         file_complexity = 0
         for block in data[filename]:
             num_blocks += 1
+            if isinstance(block, basestring):
+                # Syntax errors in code cause radon to set this to 'error'
+                continue
             block_complexity = block['complexity']
             total_block_complexity += block_complexity
             file_complexity += block_complexity
@@ -34,12 +37,8 @@ def analyze_complexity_report(filename):
         total_file_complexity += file_complexity
 
         # Update min/max if necessary
-        if file_complexity > max_file_complexity:
-            max_file_complexity = file_complexity
-            most_complex_file = filename
-        if file_complexity < min_file_complexity:
-            min_file_complexity = file_complexity
-            least_complex_file = filename
+        max_file_complexity = max(max_file_complexity, file_complexity)
+        min_file_complexity = min(min_file_complexity, file_complexity)
 
     return {
         'max_file_complexity': max_file_complexity,
@@ -48,10 +47,7 @@ def analyze_complexity_report(filename):
         'min_block_complexity': min_block_complexity,
         'mean_file_complexity': total_file_complexity / float(len(data)),
         'mean_block_complexity': total_block_complexity / float(num_blocks),
-        'most_complex_file': most_complex_file,
-        'least_complex_file': least_complex_file
     }
 
 if __name__ == '__main__':
-    import sys, pprint
     pprint.pprint(analyze_complexity_report(sys.argv[1]))

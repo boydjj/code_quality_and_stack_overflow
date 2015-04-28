@@ -26,18 +26,23 @@ def gather_commits(project):
                                           '--until="{}"'.format(date), branch],
                                          cwd=project_dir).strip()
         if not commit:
-            # Some projects (e.g., Flask) don't have a commit as early as
-            # the quarter's start date, so we just get the earliest one.
-            commit = subprocess.check_output(['git', 'rev-list',
-                                              '--max-parents=0', 'HEAD'],
-                                             cwd=project_dir).strip()
+            # Some projects (e.g., Flask) don't have a commit as early as the
+            # quarter's start date, and some (e.g., Tornado) have a bunch of
+            # useless initial commits. So we fall through various strategies to
+            # get a useful one.
+            if hasattr(project, 'FIRST_MEANINGFUL_COMMIT'):
+                commit = project.FIRST_MEANINGFUL_COMMIT
+            else:
+                commit = subprocess.check_output(['git', 'rev-list',
+                                                  '--max-parents=0', 'HEAD'],
+                                                 cwd=project_dir).strip()
         results[date] = commit
 
     return results
 
 
 if __name__ == '__main__':
-    projects = flask_project,
+    projects = requests_project,
 
     for project in projects:
         commits = gather_commits(project)
