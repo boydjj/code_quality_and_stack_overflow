@@ -3,7 +3,7 @@ import os
 from gather_metrics import DATA_ROOT_DIR, PROJECT_ROOT_DIR
 import run_metrics
 
-import django_project as project
+import flask_project as project
 
 data_dir = os.path.join(DATA_ROOT_DIR, project.DIR)
 project_dir = os.path.join(PROJECT_ROOT_DIR, project.DIR)
